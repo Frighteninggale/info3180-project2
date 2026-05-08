@@ -4,6 +4,7 @@ Flask-Migrate==4.0.7
 Flask-Bcrypt==1.0.1
 Flask-CORS==4.0.1
 Flask-Login==0.6.3
+gunicorn==21.2.0
 python-dotenv==1.0.1
 psycopg2-binary==2.9.9
 Pillow>=10.4.0

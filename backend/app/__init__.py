@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -89,3 +89,10 @@ def create_app(config_class=None):
     
 
     return app
+
+# Create the app instance for gunicorn
+app = create_app()
+
+# Run database migrations on startup
+with app.app_context():
+    upgrade()

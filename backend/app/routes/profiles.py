@@ -21,6 +21,16 @@ def get_or_create_interest(name):
 @profiles_bp.route('', methods=['POST'])
 @login_required
 def create_profile():
+
+    # --- DEBUG ---
+    print(f"🔍 Profile creation attempt")
+    print(f"   Current user: {current_user}")
+    print(f"   User ID: {current_user.id if current_user.is_authenticated else 'Not authenticated'}")
+    print(f"   Request headers: {dict(request.headers)}")
+    print(f"   Cookies: {request.cookies}")
+    #end DEBUG ---
+
+
     if current_user.profile:
         return jsonify({'error': 'Profile already exists'}), 409
 
@@ -84,6 +94,18 @@ def create_profile():
 @profiles_bp.route('/me', methods=['GET'])
 @login_required
 def get_my_profile():
+
+    # --- DEBUG ---
+    print("=" * 50)
+    print("🔍 GET /api/profiles/me called")
+    print(f"   Current user: {current_user}")
+    print(f"   User authenticated: {current_user.is_authenticated if hasattr(current_user, 'is_authenticated') else 'Unknown'}")
+    print(f"   Request cookies: {request.cookies}")
+    print(f"   Session: {dict(session) if hasattr(request, 'session') else 'No session'}")
+    print("=" * 50)
+    #end DEBUG ---
+
+
     profile = current_user.profile
     if not profile:
         return jsonify({'error': 'No profile found'}), 404
@@ -138,11 +160,26 @@ def update_my_profile():
 
     # Update interests if provided
     interest_names = request.form.getlist('interests')
-    if interest_names:
-        profile.interests.clear()
-        for name in interest_names:
-            if name:
-                profile.interests.append(get_or_create_interest(name))
+    if interest_names and len(interest_names) > 0:
+        try:
+            # Clear existing interests
+            profile.interests.clear()
+            # Flush to execute the DELETE immediately
+            db.session.flush()
+            
+            # Add new interests
+            for name in interest_names:
+                if name and name.strip():
+                    interest = get_or_create_interest(name.strip().lower())
+                    # Check not already in collection (should be empty, but safe)
+                    if interest not in profile.interests:
+                        profile.interests.append(interest)
+            
+            print(f"Updated interests for user {current_user.id}: {interest_names}")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating interests: {e}")
+            return jsonify({'error': f'Failed to update interests: {str(e)}'}), 500
 
     if file and file.filename:
         # Remove old picture
@@ -154,9 +191,13 @@ def update_my_profile():
         if filename:
             profile.profile_picture = filename
 
-    db.session.commit()
-    return jsonify({'message': 'Profile updated', 'profile': profile.to_dict(include_private=True)}), 200
-
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Profile updated', 'profile': profile.to_dict(include_private=True)}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error committing profile update: {e}")
+        return jsonify({'error': f'Failed to save profile: {str(e)}'}), 500
 
 @profiles_bp.route('/<int:user_id>', methods=['GET'])
 @login_required

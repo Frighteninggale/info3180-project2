@@ -1,7 +1,4 @@
-"""
-seed.py - Populate the database with sample data for testing.
-Run: python seed.py
-"""
+"""Seed to populate the database with sample data for testing. Run: python seed.py"""
 from app import create_app, db
 from app.models.user import User
 from app.models.profile import Profile, Interest
@@ -58,9 +55,9 @@ USERS = [
     },
 ]
 
-
 def seed():
     with app.app_context():
+        # Drop all tables and recreate
         db.drop_all()
         db.create_all()
         print("Database tables created.")
@@ -74,13 +71,21 @@ def seed():
         db.session.commit()
         print(f"Created {len(INTERESTS)} interests.")
 
-        # Create users + profiles
+        # Create users and profiles
         for u_data in USERS:
-            user = User(email=u_data['email'], username=u_data['username'])
+            # Create user - adjust fields based on your User model
+            # If your User model has 'name' field, include it; otherwise remove it
+            user = User(
+                email=u_data['email'], 
+                username=u_data['username']
+                # Remove 'name' if your User model doesn't have it
+                # If your model has 'first_name' and 'last_name' in User, add them
+            )
             user.set_password(u_data['password'])
             db.session.add(user)
-            db.session.flush()  # get user.id
+            db.session.flush()  # Get user.id
 
+            # Create profile
             profile = Profile(
                 user_id=user.id,
                 first_name=u_data['first_name'],
@@ -100,6 +105,8 @@ def seed():
                 max_age_preference=35,
                 max_distance_km=200,
             )
+            
+            # Add interests to profile
             for iname in u_data['interests']:
                 profile.interests.append(interest_objs[iname])
 
@@ -107,11 +114,11 @@ def seed():
 
         db.session.commit()
         print(f"Created {len(USERS)} users with profiles.")
-        print("\nTest accounts:")
+        print("\n✓ Test accounts created successfully!")
+        print("\nTest accounts (email / password):")
         for u in USERS:
-            print(f"  Email: {u['email']}  Password: {u['password']}")
-        print("\nSeeding complete!")
-
+            print(f"  📧 {u['email']}  🔑 {u['password']}")
+        print("\n⭐ Seeding complete!")
 
 if __name__ == '__main__':
     seed()

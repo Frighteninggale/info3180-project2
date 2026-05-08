@@ -11,6 +11,12 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // Allow external access
+    allowedHosts: [
+      'driftdater-frontend-7s49.onrender.com',
+      '.onrender.com', 
+      'localhost'
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

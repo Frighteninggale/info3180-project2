@@ -93,6 +93,7 @@ def create_app(config_class=None):
 # Create the app instance for gunicorn
 app = create_app()
 
-# Run database migrations on startup
-with app.app_context():
+
+# Only run migrations in development
+if os.environ.get('FLASK_ENV') == 'development':
     upgrade()

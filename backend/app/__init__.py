@@ -5,7 +5,6 @@ from flask_migrate import Migrate, upgrade
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_login import LoginManager
-
 from app.routes import main_bp
 import os
 
@@ -53,7 +52,8 @@ def create_app(config_class=None):
      origins=["http://localhost:5173", "http://127.0.0.1:5173","https://driftdater-frontend-7s49.onrender.com"],
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     expose_headers=["Content-Type", "Authorization"]  )
 
 
     # Import models so Flask-Migrate picks them up
@@ -95,5 +95,5 @@ app = create_app()
 
 
 # Only run migrations in development
-if os.environ.get('FLASK_ENV') == 'development':
-    upgrade()
+# if os.environ.get('FLASK_ENV') == 'development':
+#     upgrade()

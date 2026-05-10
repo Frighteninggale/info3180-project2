@@ -51,7 +51,7 @@ def create_app(config_class=None):
     CORS(app, 
      origins=["http://localhost:5173", "http://127.0.0.1:5173","https://driftdater-frontend-7s49.onrender.com"],
      supports_credentials=True,
-     allow_headers=["Content-Type", "Authorization"],
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      expose_headers=["Content-Type", "Authorization"]  )
 

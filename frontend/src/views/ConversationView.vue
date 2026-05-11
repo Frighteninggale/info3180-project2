@@ -3,7 +3,7 @@
     <div class="conv-header">
       <router-link to="/messages" class="btn btn-secondary btn-sm"><ChevronLeft :size="16" /> Back</router-link>
       <div v-if="partnerProfile" class="conv-partner">
-        <img v-if="partnerPic" :src="partnerPic" class="partner-avatar" />
+        <img v-if="partnerPic && !partnerImageError" :src="partnerPic" class="partner-avatar" @error="partnerImageError = true" />
         <div v-else class="partner-placeholder"><UserCircle :size="34" color="#fff" /></div>
         <div>
           <strong>{{ partnerProfile.first_name }} {{ partnerProfile.last_name }}</strong>
@@ -54,6 +54,7 @@ const loading = ref(true), sending = ref(false)
 const messages = ref([]), newMessage = ref('')
 const partnerProfile = ref(null), partnerPic = ref(null)
 const msgBox = ref(null)
+const partnerImageError = ref(false)
 let pollInterval = null
 
 onMounted(async () => {

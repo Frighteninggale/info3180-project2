@@ -89,7 +89,7 @@
       </div>
       <div class="form-group">
         <label>Profile Picture</label>
-        <div v-if="existingPic" class="pic-preview"><img :src="existingPic" alt="Current" /></div>
+        <div v-if="existingPic && !previewImageError" class="pic-preview"><img :src="existingPic" alt="Current" @error="previewImageError = true" /></div>
         <input type="file" accept="image/*" @change="onFileChange" style="margin-top:8px" />
       </div>
       <div class="form-group">

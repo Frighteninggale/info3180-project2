@@ -5,7 +5,7 @@
       <!-- My Profile Summary -->
       <div class="card dash-header" v-if="myProfile">
         <div class="dash-profile">
-          <img v-if="picUrl" :src="picUrl" class="dash-avatar" alt="Profile" />
+          <img v-if="picUrl && !ownImageError" :src="picUrl" class="dash-avatar" alt="Profile" @error="ownImageError = true" />
           <div v-else class="dash-avatar-placeholder">
             <UserCircle :size="60" color="#fff" />
           </div>
@@ -95,6 +95,7 @@ const favouriteIds = ref(new Set())
 const filterName = ref('')
 const filterAge = ref('')
 const filterCity = ref('')
+const ownImageError = ref(false)
 
 const filteredProfiles = computed(() => {
   let list = browseProfiles.value

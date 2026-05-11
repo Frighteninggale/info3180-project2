@@ -19,7 +19,7 @@
         <router-link to="/search"><Search :size="16" /> Search</router-link>
         <router-link to="/favourites"><Star :size="16" /> Saved</router-link>
         <router-link to="/profile/edit" class="nav-profile-link">
-          <img v-if="profilePic" :src="profilePic" class="nav-avatar" alt="Profile" />
+          <img v-if="profilePic && !navImageError" :src="profilePic" class="nav-avatar" alt="Profile" @error="navImageError = true" />
           <span v-else class="nav-avatar-placeholder">{{ initials }}</span>
           {{ displayName }}
         </router-link>
@@ -46,6 +46,7 @@ const router = useRouter()
 const menuOpen = ref(false)
 const matchCount = ref(0)
 const profilePic = ref(null)
+const navImageError = ref(false)
 
 const displayName = computed(() => auth.user?.username || '')
 const initials = computed(() => (auth.user?.username || 'U').charAt(0).toUpperCase())

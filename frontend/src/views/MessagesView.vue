@@ -12,8 +12,8 @@
     <div v-else class="conv-list">
       <router-link v-for="conv in conversations" :key="conv.partner_id" :to="`/messages/${conv.partner_id}`" class="conv-item">
         <div class="conv-avatar">
-          <img v-if="getPic(conv)" :src="getPic(conv)" :alt="conv.profile?.first_name" />
-          <div v-else class="conv-placeholder"><UserCircle :size="38" color="#fff" /></div>
+          <img v-if="getPic(conv)" :src="getPic(conv)" :alt="conv.profile?.first_name"  @error="handleImageError(conv.partner_id)" />
+          <div v-if="!getPic(conv) || imageLoadError[conv.partner_id]" class="conv-placeholder"><UserCircle :size="38" color="#fff" /></div>
         </div>
         <div class="conv-info">
           <div class="conv-header">
@@ -38,11 +38,21 @@ import { MessageCircle, MailOpen, Heart, UserCircle, MessageSquareDashed } from 
 
 const loading = ref(true)
 const conversations = ref([])
+const imageLoadError = ref({})
+
+function handleImageError(partnerId) {
+  imageLoadError.value[partnerId] = true
+}
+
+function getPic(conv) {
+  if (imageLoadError.value[conv.partner_id]) return null
+  return profilesAPI.getPictureUrl(conv.profile?.profile_picture)
+}
+
 onMounted(async () => {
   try { const res = await messagesAPI.getConversations(); conversations.value = res.data.conversations }
   catch {} finally { loading.value = false }
 })
-function getPic(conv) { return profilesAPI.getPictureUrl(conv.profile?.profile_picture) }
 function formatTime(iso) {
   if (!iso) return ''
   const d = new Date(iso), now = new Date()

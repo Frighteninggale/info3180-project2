@@ -5,7 +5,7 @@
     <template v-else>
       <div class="card profile-hero">
         <div class="ph-top">
-          <img v-if="picUrl" :src="picUrl" class="ph-avatar" alt="Profile" />
+          <img v-if="picUrl && !imageLoadError" :src="picUrl" class="ph-avatar" alt="Profile" @error="imageLoadError = true" />
           <div v-else class="ph-placeholder"><UserCircle :size="70" color="#fff" /></div>
           <div class="ph-main">
             <h1>{{ profile.first_name }} {{ profile.last_name }}, {{ profile.age }}</h1>
@@ -74,6 +74,7 @@ const auth = useAuthStore()
 const loading = ref(true)
 const profile = ref(null), picUrl = ref(null)
 const myAction = ref(null), isMutual = ref(false), isFav = ref(false)
+const imageLoadError = ref(false)
 const isOwnProfile = computed(() => profile.value?.user_id === auth.user?.id)
 
 onMounted(async () => {

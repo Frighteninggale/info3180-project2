@@ -1,7 +1,7 @@
 <template>
   <div class="profile-card" @click="$emit('click', profile)">
     <div class="pc-photo">
-      <img v-if="picUrl" :src="picUrl" :alt="profile.first_name" />
+      <img v-if="picUrl" :src="picUrl" :alt="profile.first_name" @error="handleImageError" />
       <div v-else class="pc-placeholder">
         <UserCircle :size="54" color="#fff" />
       </div>
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { profilesAPI } from '@/api'
 import { UserCircle, MapPin, ThumbsUp, X, Star, StarOff, Eye, Percent } from 'lucide-vue-next'
 
@@ -55,7 +55,20 @@ const props = defineProps({
 })
 defineEmits(['like', 'pass', 'favourite', 'click'])
 
-const picUrl = computed(() => profilesAPI.getPictureUrl(props.profile.profile_picture))
+const imageLoadError = ref(false)
+
+const picUrl = computed(() => {
+  if (imageLoadError.value) {
+    return null  // Return null to show placeholder
+  }
+  return profilesAPI.getPictureUrl(props.profile.profile_picture)
+})
+
+const handleImageError = () => {
+  imageLoadError.value = true
+  console.log(`Failed to load image for ${props.profile.first_name}`)
+}
+
 </script>
 
 <style scoped>
